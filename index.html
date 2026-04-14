@@ -3,152 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adu Angka - Player vs Host</title>
+    <title>Adu Angka - 0 is THE KING</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { box-sizing: border-box; font-family: 'Courier New', Courier, monospace; }
         body { 
-            background: #121212; color: white; 
+            background: #050505; color: #fff; 
             display: flex; justify-content: center; align-items: center; 
             height: 100vh; margin: 0; 
         }
 
-        .game-card {
-            background: #1e1e1e; width: 90%; max-width: 400px;
-            padding: 20px; border-radius: 15px; border: 2px solid #333;
-            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        .wrapper {
+            background: #111; width: 95%; max-width: 400px;
+            padding: 20px; border: 3px solid #444; border-radius: 10px;
+            text-align: center; box-shadow: 0 0 20px rgba(0,255,0,0.1);
         }
 
-        .balance-section {
-            background: #252525; padding: 10px; border-radius: 10px;
-            margin-bottom: 20px; border-bottom: 3px solid #ffd700;
+        .display-saldo {
+            font-size: 22px; color: #0f0; margin-bottom: 20px;
+            text-shadow: 0 0 5px #0f0;
         }
 
-        .battle-field {
+        .board {
             display: flex; justify-content: space-around; align-items: center;
-            margin: 30px 0;
+            background: #222; padding: 20px 10px; border-radius: 8px;
+            margin-bottom: 20px; border: 1px solid #333;
         }
 
-        .box {
-            width: 100px; height: 100px; background: #333;
-            border-radius: 10px; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; border: 1px solid #444;
+        .side { flex: 1; }
+        .val { 
+            font-size: 45px; font-weight: bold; margin: 10px 0; 
+            color: #fff;
+        }
+        .king { color: #ffcc00; text-shadow: 0 0 10px #ffcc00; font-size: 55px; }
+
+        input {
+            width: 100%; padding: 12px; background: #000; color: #0f0;
+            border: 1px solid #0f0; border-radius: 5px; margin-bottom: 10px;
+            text-align: center; font-size: 18px;
         }
 
-        .box label { font-size: 12px; color: #aaa; margin-bottom: 5px; }
-        .box .number { font-size: 32px; font-weight: bold; }
-
-        .vs { font-size: 24px; font-weight: 900; color: #ff4500; }
-
-        .controls input {
-            width: 100%; padding: 12px; margin-bottom: 10px;
-            background: #252525; border: 1px solid #444; color: white;
-            border-radius: 8px; text-align: center;
+        button {
+            width: 100%; padding: 15px; background: #0f0; color: #000;
+            border: none; border-radius: 5px; font-weight: bold;
+            font-size: 18px; cursor: pointer;
         }
 
-        #play-btn {
-            width: 100%; padding: 15px; background: #ffd700;
-            border: none; border-radius: 8px; font-weight: bold;
-            font-size: 18px; cursor: pointer; transition: 0.2s;
-        }
+        button:active { background: #0a0; transform: translateY(2px); }
 
-        #play-btn:active { transform: scale(0.98); }
-        
-        #result-msg {
-            margin-top: 20px; font-weight: bold; height: 20px;
-        }
+        #msg { margin-top: 20px; font-size: 16px; font-weight: bold; min-height: 24px; }
+        .x3-notif { color: #ffcc00; animation: blink 0.5s step-end infinite; }
 
-        .win { color: #00ff00; }
-        .lose { color: #ff4444; }
-        .draw { color: #ffff00; }
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-<div class="game-card">
-    <div class="balance-section">
-        <small>SALDO ANDA</small>
-        <div id="balance" style="font-size: 24px; font-weight: bold; color: #ffd700;">1000</div>
-    </div>
+<div class="wrapper">
+    <div class="display-saldo">POIN: <span id="points">1000</span></div>
 
-    <div class="battle-field">
-        <div class="box">
-            <label>PLAYER</label>
-            <div id="p-num" class="number">?</div>
+    <div class="board">
+        <div class="side">
+            <small>PLAYER</small>
+            <div id="p-val" class="val">?</div>
         </div>
-        <div class="vs">VS</div>
-        <div class="box">
-            <label>HOST</label>
-            <div id="h-num" class="number">?</div>
+        <div style="font-size: 20px; color: #555;">VS</div>
+        <div class="side">
+            <small>HOST</small>
+            <div id="h-val" class="val">?</div>
         </div>
     </div>
 
-    <div class="controls">
-        <input type="number" id="bet" placeholder="Masukkan Taruhan" min="1">
-        <button id="play-btn" onclick="tanding()">TANDINGKAN!</button>
-    </div>
+    <input type="number" id="bet-input" placeholder="JUMLAH BET">
+    <button onclick="gas()">TANDINGKAN!</button>
 
-    <div id="result-msg"></div>
+    <div id="msg"></div>
+    <p style="font-size: 11px; color: #444; margin-top: 15px;">Rule: 0 beats 1-30 (Win x3). Max: 30.</p>
 </div>
 
 <script>
-    let points = parseInt(localStorage.getItem("points_adu")) || 1000;
-    document.getElementById("balance").innerText = points;
+    let saldo = parseInt(localStorage.getItem("saldo_king")) || 1000;
+    updateUI();
 
-    function tanding() {
-        const betInput = document.getElementById("bet");
-        const betAmt = parseInt(betInput.value);
-        const resMsg = document.getElementById("result-msg");
-        const pNumEl = document.getElementById("p-num");
-        const hNumEl = document.getElementById("h-num");
+    function gas() {
+        const betInput = document.getElementById("bet-input");
+        const bet = parseInt(betInput.value);
+        const msg = document.getElementById("msg");
+        const pEl = document.getElementById("p-val");
+        const hEl = document.getElementById("h-val");
 
-        // Validasi
-        if (isNaN(betAmt) || betAmt <= 0) {
-            alert("Masukkan jumlah taruhan!");
-            return;
-        }
-        if (betAmt > points) {
-            alert("Saldo tidak cukup!");
-            return;
-        }
+        if (isNaN(bet) || bet <= 0) return alert("Isi bet dulu!");
+        if (bet > saldo) return alert("Poin kurang!");
 
-        // Animasi acak sebentar
-        resMsg.innerText = "Mengadu angka...";
-        let count = 0;
-        const interval = setInterval(() => {
-            pNumEl.innerText = Math.floor(Math.random() * 10);
-            hNumEl.innerText = Math.floor(Math.random() * 10);
-            count++;
-            if (count > 10) {
-                clearInterval(interval);
-                tentukanPemenang(betAmt);
+        saldo -= bet;
+        updateUI();
+        msg.innerText = "BERADU...";
+        pEl.classList.remove("king");
+        hEl.classList.remove("king");
+
+        // Animasi Rolling
+        let spinCount = 0;
+        let roll = setInterval(() => {
+            pEl.innerText = Math.floor(Math.random() * 31);
+            hEl.innerText = Math.floor(Math.random() * 31);
+            spinCount++;
+            if (spinCount > 12) {
+                clearInterval(roll);
+                finish(bet);
             }
-        }, 50);
+        }, 60);
     }
 
-    function tentukanPemenang(bet) {
-        const pNum = Math.floor(Math.random() * 10) + 1; // 1-10
-        const hNum = Math.floor(Math.random() * 10) + 1; // 1-10
-        const resMsg = document.getElementById("result-msg");
+    function finish(bet) {
+        const pNum = Math.floor(Math.random() * 31); // 0 - 30
+        const hNum = Math.floor(Math.random() * 31);
+        const msg = document.getElementById("msg");
+        const pEl = document.getElementById("p-val");
+        const hEl = document.getElementById("h-val");
 
-        document.getElementById("p-num").innerText = pNum;
-        document.getElementById("h-num").innerText = hNum;
+        pEl.innerText = pNum;
+        hEl.innerText = hNum;
 
-        if (pNum > hNum) {
-            points += bet;
-            resMsg.innerHTML = `<span class="win">MENANG! +${bet} Poin</span>`;
-        } else if (hNum > pNum) {
-            points -= bet;
-            resMsg.innerHTML = `<span class="lose">KALAH! -${bet} Poin</span>`;
-        } else {
-            resMsg.innerHTML = `<span class="draw">SERI! Poin Kembali</span>`;
+        // Visual check for King (0)
+        if (pNum === 0) pEl.classList.add("king");
+        if (hNum === 0) hEl.classList.add("king");
+
+        // LOGIKA PEMENANG
+        if (pNum === hNum) {
+            // SERI
+            saldo += bet;
+            msg.innerHTML = '<span style="color:yellow">DRAW! Poin Kembali.</span>';
+        } 
+        else if (pNum === 0) {
+            // Player dapet 0 (KING) - Otomatis Win x3
+            const winAmt = bet * 3;
+            saldo += winAmt;
+            msg.innerHTML = `<span class="x3-notif">JACKPOT KING 0! +${winAmt}</span>`;
+        } 
+        else if (hNum === 0) {
+            // Host dapet 0 (KING) - Player Lose
+            msg.innerHTML = '<span style="color:red">LOSE! Host is THE KING.</span>';
+        } 
+        else if (pNum > hNum) {
+            // Menang Biasa (Angka lebih besar)
+            const winAmt = bet * 2;
+            saldo += winAmt;
+            msg.innerHTML = `<span style="color:#0f0">WIN! +${winAmt}</span>`;
+        } 
+        else {
+            // Kalah Biasa
+            msg.innerHTML = '<span style="color:red">LOSE! Angka Host lebih besar.</span>';
         }
 
-        updatePoints();
+        updateUI();
     }
 
-    function updatePoints() {
-        document.getElementById("balance").innerText = points;
-        localStorage.setItem("points_adu", points);
+    function updateUI() {
+        document.getElementById("points").innerText = saldo;
+        localStorage.setItem("saldo_king", saldo);
     }
 </script>
 
