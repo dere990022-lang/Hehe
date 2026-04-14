@@ -3,29 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mahjong Ways Pro</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Mahjong Ways Gacor</title>
+    <style>
+        /* CSS RESET & BASE */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            background: #000; 
+            color: white; 
+            font-family: sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .game-wrapper {
+            width: 100%;
+            max-width: 450px; /* Maksimal lebar layar HP */
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            border: 2px solid #333;
+        }
+
+        .header { text-align: center; margin-bottom: 10px; }
+        .title { font-size: 20px; font-weight: 900; color: #ffd700; }
+        .red { color: #ff0000; }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            gap: 10px;
+        }
+
+        .stat-box {
+            flex: 1;
+            background: #222;
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* GRID FIXED 5 KOLOM */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* WAJIB 5 KOLOM */
+            grid-template-rows: repeat(4, 1fr);    /* 4 BARIS */
+            gap: 4px;
+            background: #7b0000;
+            padding: 6px;
+            border-radius: 8px;
+            aspect-ratio: 5/6; /* Menjaga bentuk grid tetap kotak/portrait */
+        }
+
+        .tile {
+            background: #fff;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px; /* Ukuran simbol */
+            color: #000;
+            box-shadow: inset 0 -3px 0 #bbb;
+            user-select: none;
+        }
+
+        .tile.gold {
+            background: linear-gradient(135deg, #fff700, #ff8c00);
+            box-shadow: inset 0 -3px 0 #b8860b;
+        }
+
+        .spinning {
+            filter: blur(2px);
+            opacity: 0.8;
+            transform: scale(0.95);
+        }
+
+        .win-glow {
+            animation: win 0.4s infinite alternate;
+            z-index: 5;
+            border: 2px solid gold;
+        }
+
+        @keyframes win { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+        /* KONTROL */
+        .footer {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        #spin-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: radial-gradient(#ffe066, #ffcc00);
+            border: 4px solid #333;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        #spin-btn:active { transform: scale(0.9); }
+        #info { margin-top: 10px; color: #0f0; font-size: 14px; height: 16px; }
+    </style>
 </head>
 <body>
-    <div class="game-container">
-        <div class="header">
-            <div class="title">MAHJONG <span class="red">WAYS</span></div>
-            <div class="stats">
-                <div class="stat-box">SALDO: <span id="balance">1000</span></div>
-                <div class="stat-box">MENANG: <span id="last-win">0</span></div>
-            </div>
-        </div>
 
-        <div id="slot-grid" class="grid">
-            </div>
-
-        <div class="controls">
-            <div class="bet-control">BET: 10</div>
-            <button id="spin-btn" onclick="startSpin()">PUTAR</button>
+<div class="game-wrapper">
+    <div class="header">
+        <div class="title">MAHJONG <span class="red">WAYS</span></div>
+        <div class="stats">
+            <div class="stat-box">SALDO: <span id="balance">1000</span></div>
+            <div class="stat-box">MENANG: <span id="win-amt">0</span></div>
         </div>
-        <p id="info-text">Siap untuk menang?</p>
     </div>
-    <script src="script.js"></script>
+
+    <div id="grid" class="grid-container"></div>
+
+    <div class="footer">
+        <div style="font-size: 12px; margin-bottom: 5px;">BET: 10</div>
+        <button id="spin-btn" onclick="play()">SPIN</button>
+        <p id="info"></p>
+    </div>
+</div>
+
+<script>
+    const symbols = ['🀄', '🀅', '🀆', '🀐', '🀙', '🀛', '🀃'];
+    let balance = 1000;
+    let isSpinning = false;
+
+    const gridEl = document.getElementById('grid');
+    const balanceEl = document.getElementById('balance');
+    const winEl = document.getElementById('win-amt');
+    const infoEl = document.getElementById('info');
+
+    // Buat grid awal
+    function createGrid() {
+        gridEl.innerHTML = '';
+        for (let i = 0; i < 20; i++) {
+            const t = document.createElement('div');
+            t.className = 'tile';
+            t.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+            gridEl.appendChild(t);
+        }
+    }
+
+    async function play() {
+        if (isSpinning || balance < 10) return;
+        
+        isSpinning = true;
+        balance -= 10;
+        balanceEl.innerText = balance;
+        winEl.innerText = "0";
+        infoEl.innerText = "Memutar...";
+
+        const tiles = document.querySelectorAll('.tile');
+        tiles.forEach(t => t.classList.add('spinning'));
+
+        setTimeout(() => {
+            renderResult();
+        }, 600);
+    }
+
+    function renderResult() {
+        gridEl.innerHTML = '';
+        const matrix = [];
+
+        for (let r = 0; r < 4; r++) {
+            matrix[r] = [];
+            for (let c = 0; c < 5; c++) {
+                const s = symbols[Math.floor(Math.random() * symbols.length)];
+                const gold = Math.random() > 0.85;
+                matrix[r][c] = { s, gold };
+                
+                const div = document.createElement('div');
+                div.className = `tile ${gold ? 'gold' : ''}`;
+                div.id = `r${r}c${c}`;
+                div.innerText = s;
+                gridEl.appendChild(div);
+            }
+        }
+
+        checkWays(matrix);
+        isSpinning = false;
+    }
+
+    function checkWays(data) {
+        let win = 0;
+        // Cek simbol dari kolom 0
+        for (let r = 0; r < 4; r++) {
+            const target = data[r][0].s;
+            let matchedTiles = [`r${r}c0`];
+
+            for (let c = 1; c < 5; c++) {
+                let foundInCol = false;
+                for (let r2 = 0; r2 < 4; r2++) {
+                    if (data[r2][c].s === target) {
+                        matchedTiles.push(`r${r2}c${c}`);
+                        foundInCol = true;
+                    }
+                }
+                if (!foundInCol) break;
+            }
+
+            if (new Set(matchedTiles.map(id => id.split('c')[1])).size >= 3) {
+                matchedTiles.forEach(id => document.getElementById(id).classList.add('win-glow'));
+                win += matchedTiles.length * 5;
+            }
+        }
+
+        if (win > 0) {
+            balance += win;
+            balanceEl.innerText = balance;
+            winEl.innerText = win;
+            infoEl.innerText = "MENANG!";
+        } else {
+            infoEl.innerText = "";
+        }
+    }
+
+    createGrid();
+</script>
+
 </body>
 </html>
-
