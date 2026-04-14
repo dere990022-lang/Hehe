@@ -3,13 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Adu Angka: Reel King 0</title>
+    <title>KING 0 - Vertical Slot Edition</title>
     <style>
+        :root {
+            --gold: #ffcc00;
+            --bg: #0d0d0d;
+            --panel: #1a1a1a;
+            --border: #333;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        
+
         body { 
-            background: #0d0d0d; 
-            color: #fff; 
+            background: var(--bg); 
+            color: white; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
@@ -18,52 +25,65 @@
         }
 
         .game-card {
-            background: #1a1a1a;
+            background: var(--panel);
             width: 90%;
             max-width: 400px;
             border-radius: 25px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            border: 1px solid #333;
+            border: 2px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0,0,0,1);
             padding-bottom: 20px;
         }
 
+        /* HEADER */
         .header {
             padding: 20px;
             text-align: center;
-            border-bottom: 1px solid #2a2a2a;
+            border-bottom: 1px solid var(--border);
         }
+        .header h1 { font-size: 14px; letter-spacing: 3px; color: #888; text-transform: uppercase; }
+        .header h1 span { color: var(--gold); }
 
-        .balance-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
-        .balance-val { font-size: 28px; font-weight: bold; color: #00ff88; text-shadow: 0 0 10px rgba(0,255,136,0.3); }
-
-        /* SLOT REEL SYSTEM */
-        .arena {
-            display: grid;
-            grid-template-columns: 1fr 40px 1fr;
-            align-items: center;
-            padding: 30px 15px;
-        }
-
-        .reel-container {
+        .balance-display {
             background: #000;
-            height: 100px;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid #444;
+        }
+        .balance-display span { font-size: 24px; font-weight: bold; color: #00ff88; }
+
+        /* SLOT MACHINE AREA */
+        .slot-machine {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 40px 20px;
+        }
+
+        .reel-window {
+            width: 100px;
+            height: 120px;
+            background: #000;
+            border: 3px solid #333;
             border-radius: 15px;
-            border: 2px solid #333;
-            overflow: hidden; /* Potong angka yang lewat */
             position: relative;
-            box-shadow: inset 0 0 15px rgba(0,0,0,1);
+            overflow: hidden; /* Supaya angka yang lewat gak kelihatan */
+            box-shadow: inset 0 0 20px rgba(0,0,0,1);
         }
 
         .reel-strip {
+            position: absolute;
+            width: 100%;
+            top: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: transform 3s cubic-bezier(0.1, 0, 0.1, 1); /* Efek ngerem perlahan */
+            transition: transform 3s cubic-bezier(0.1, 0, 0, 1); /* Animasi lama & smooth */
         }
 
         .slot-num {
-            height: 100px;
-            min-height: 100px;
+            height: 120px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -72,178 +92,183 @@
             color: #fff;
         }
 
-        .vs-label { font-weight: 900; color: #444; font-style: italic; text-align: center; }
+        .vs { font-size: 24px; font-weight: 900; color: #444; font-style: italic; }
 
-        /* Tombol & Input */
-        .controls { padding: 0 20px; }
+        /* KHUSUS ANGKA 0 */
+        .king-0 {
+            color: var(--gold);
+            text-shadow: 0 0 20px rgba(255,204,0,0.8);
+        }
+
+        /* CONTROLS */
+        .controls { padding: 0 25px; }
         
         input {
             width: 100%;
             padding: 15px;
-            background: #252525;
+            background: #000;
             border: 1px solid #444;
-            color: #ffd700;
             border-radius: 12px;
+            color: var(--gold);
             font-size: 18px;
             text-align: center;
             margin-bottom: 15px;
         }
 
-        #spin-btn {
+        button {
             width: 100%;
             padding: 18px;
-            background: linear-gradient(135deg, #ffd700, #b8860b);
+            background: linear-gradient(to bottom, var(--gold), #b8860b);
             border: none;
             border-radius: 12px;
-            color: #000;
-            font-weight: 800;
+            font-weight: bold;
             font-size: 18px;
             cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255,204,0,0.2);
+        }
+
+        button:active { transform: scale(0.98); }
+        button:disabled { background: #444; opacity: 0.5; }
+
+        .result-text {
+            text-align: center;
+            margin-top: 15px;
+            min-height: 24px;
+            font-weight: bold;
             text-transform: uppercase;
         }
 
-        #spin-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        #msg { text-align: center; margin: 15px 0; font-weight: bold; min-height: 20px; font-size: 14px; }
-
-        /* King 0 Style */
-        .is-zero { color: #ffd700 !important; text-shadow: 0 0 20px gold; }
-
-        .footer-info { font-size: 10px; color: #444; text-align: center; margin-top: 10px; }
+        .jackpot-anim { animation: pulse 0.5s infinite alternate; }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
     </style>
 </head>
 <body>
 
 <div class="game-card">
     <div class="header">
-        <div class="balance-label">TOTAL CREDITS</div>
-        <div id="balance" class="balance-val">1000</div>
-    </div>
-
-    <div class="arena">
-        <div class="reel-container">
-            <div id="p-strip" class="reel-strip">
-                <div class="slot-num">?</div>
-            </div>
-        </div>
-        
-        <div class="vs-label">VS</div>
-
-        <div class="reel-container">
-            <div id="h-strip" class="reel-strip">
-                <div class="slot-num">?</div>
-            </div>
+        <h1>BATTLE <span>KING 0</span></h1>
+        <div class="balance-display">
+            <span id="saldo">1000</span> <small style="color:#555">PTS</small>
         </div>
     </div>
 
-    <div id="msg">Tentukan bet dan GAS!</div>
+    <div class="slot-machine">
+        <div class="reel-window">
+            <div id="player-strip" class="reel-strip">
+                </div>
+        </div>
+
+        <div class="vs">VS</div>
+
+        <div class="reel-window">
+            <div id="host-strip" class="reel-strip">
+                </div>
+        </div>
+    </div>
 
     <div class="controls">
-        <input type="number" id="bet-input" placeholder="JUMLAH BET">
-        <button id="spin-btn" onclick="startSpin()">GAS TANDING!</button>
+        <input type="number" id="bet-input" placeholder="JUMLAH TARUHAN">
+        <button id="spin-btn" onclick="startSpin()">PUTAR & TANDING</button>
+        <div id="msg" class="result-text"></div>
     </div>
-    <div class="footer-info">0-30 | WIN: 45% | DRAW: HOST WIN | 0=KING(x3)</div>
+    
+    <p style="text-align:center; font-size:9px; color:#444; margin-top:10px;">WIN RATE: 45% | DRAW = HOST WIN | 0 = KING (x3)</p>
 </div>
 
 <script>
-    let points = parseInt(localStorage.getItem("saldo_reel")) || 1000;
-    const pStrip = document.getElementById('p-strip');
-    const hStrip = document.getElementById('h-strip');
-    const msg = document.getElementById('msg');
-    const spinBtn = document.getElementById('spin-btn');
-    
-    document.getElementById("balance").innerText = points;
+    let points = parseInt(localStorage.getItem("saldo_v2")) || 1000;
+    const pStrip = document.getElementById('player-strip');
+    const hStrip = document.getElementById('host-strip');
+    const msgEl = document.getElementById('msg');
+    const btn = document.getElementById('spin-btn');
 
-    function buildReel(strip, finalNum) {
-        strip.innerHTML = '';
-        // Buat 30 angka acak buat efek putar
+    document.getElementById('saldo').innerText = points;
+
+    // Fungsi buat isi angka-angka di strip (biar kelihatan muter)
+    function generateStrip(element, finalNum) {
+        element.style.transition = 'none';
+        element.style.transform = 'translateY(0)';
+        
+        let content = '';
+        // Buat 30 angka acak buat formalitas putaran
         for(let i=0; i<30; i++) {
-            const div = document.createElement('div');
-            div.className = 'slot-num';
-            div.innerText = Math.floor(Math.random() * 31);
-            strip.appendChild(div);
+            content += `<div class="slot-num">${Math.floor(Math.random() * 31)}</div>`;
         }
         // Angka terakhir adalah hasil aslinya
-        const finalDiv = document.createElement('div');
-        finalDiv.className = 'slot-num' + (finalNum === 0 ? ' is-zero' : '');
-        finalDiv.innerText = finalNum;
-        strip.appendChild(finalDiv);
+        content += `<div class="slot-num ${finalNum === 0 ? 'king-0' : ''}">${finalNum}</div>`;
+        
+        element.innerHTML = content;
+        
+        // Triger reflow
+        element.offsetHeight;
+        
+        // Jalankan animasi ke angka paling bawah
+        element.style.transition = 'transform 3s cubic-bezier(0.1, 0, 0, 1)';
+        const targetY = -30 * 120; // 30 angka x tinggi 120px
+        element.style.transform = `translateY(${targetY}px)`;
     }
 
     function startSpin() {
         const bet = parseInt(document.getElementById('bet-input').value);
-        if (isNaN(bet) || bet <= 0) return alert("Isi bet dulu!");
-        if (bet > points) return alert("Poin kurang!");
+        if (isNaN(bet) || bet <= 0) return alert("Isi bet!");
+        if (bet > points) return alert("Poin gak cukup!");
 
         points -= bet;
         updateUI();
-        
-        msg.innerText = "Berputar...";
-        msg.style.color = "#888";
-        spinBtn.disabled = true;
+        msgEl.innerText = "SEMOGA GACOR...";
+        msgEl.className = "result-text";
+        btn.disabled = true;
 
-        // Tentukan hasil duluan (Probabilitas 45%)
-        let pNum, hNum;
-        const luck = Math.random();
-        
-        if (luck < 0.45) { // Player Win
-            pNum = Math.floor(Math.random() * 31);
-            hNum = (pNum === 0) ? (Math.floor(Math.random() * 30) + 1) : Math.floor(Math.random() * pNum);
+        // Tentukan hasil di awal (Logic Probabilitas 45%)
+        let pResult, hResult;
+        const rate = Math.random();
+
+        if (rate < 0.45) { // Player Win
+            pResult = Math.floor(Math.random() * 31);
+            if (pResult === 0) hResult = Math.floor(Math.random() * 30) + 1;
+            else hResult = Math.floor(Math.random() * pResult);
         } else { // Host Win / Draw
-            hNum = Math.floor(Math.random() * 31);
-            pNum = (hNum === 0) ? Math.floor(Math.random() * 31) : Math.floor(Math.random() * (hNum + 1));
-            if (pNum === 0 && hNum !== 0) pNum = 1; // Cegah p=0 kalo host bukan 0
+            hResult = Math.floor(Math.random() * 31);
+            if (hResult === 0) pResult = Math.floor(Math.random() * 31);
+            else {
+                pResult = Math.floor(Math.random() * (hResult + 1));
+                if (pResult === 0 && hResult !== 0) pResult = 1;
+            }
         }
 
-        // Siapkan Reel
-        buildReel(pStrip, pNum);
-        buildReel(hStrip, hNum);
-
-        // Reset posisi strip
-        pStrip.style.transition = 'none';
-        hStrip.style.transition = 'none';
-        pStrip.style.transform = 'translateY(0)';
-        hStrip.style.transform = 'translateY(0)';
-
-        // Jalankan animasi (pake timeout dikit biar transition: none tadi kepasang)
-        setTimeout(() => {
-            pStrip.style.transition = 'transform 3s cubic-bezier(0.1, 0, 0.1, 1)';
-            hStrip.style.transition = 'transform 3s cubic-bezier(0.1, 0, 0.1, 1)';
-            
-            // Geser ke angka paling bawah (30 angka * 100px)
-            pStrip.style.transform = 'translateY(-3000px)';
-            hStrip.style.transform = 'translateY(-3000px)';
-        }, 50);
+        // Putar reel
+        generateStrip(pStrip, pResult);
+        generateStrip(hStrip, hResult);
 
         // Tunggu animasi selesai (3 detik)
         setTimeout(() => {
-            kalkulasi(bet, pNum, hNum);
-            spinBtn.disabled = false;
+            checkWinner(pResult, hResult, bet);
+            btn.disabled = false;
         }, 3100);
     }
 
-    function kalkulasi(bet, p, h) {
+    function checkWinner(p, h, bet) {
         if (p === h) {
-            msg.innerHTML = "DRAW! <span style='color:#ff4444'>HOST WIN.</span>";
+            msgEl.innerHTML = '<span style="color:red">DRAW! HOST WIN</span>';
         } else if (p === 0) {
             const win = bet * 3;
             points += win;
-            msg.innerHTML = "JACKPOT KING 0! <span style='color:#ffd700'>+" + win + "</span>";
+            msgEl.innerHTML = `<span style="color:var(--gold)" class="jackpot-anim">JACKPOT KING 0! +${win}</span>`;
         } else if (h === 0) {
-            msg.innerHTML = "LOSE! <span style='color:#ff4444'>HOST IS KING 0.</span>";
+            msgEl.innerHTML = '<span style="color:red">LOSE! HOST IS KING</span>';
         } else if (p > h) {
             const win = bet * 2;
             points += win;
-            msg.innerHTML = "WIN! <span style='color:#00ff88'>+" + win + "</span>";
+            msgEl.innerHTML = `<span style="color:#00ff88">WIN! +${win}</span>`;
         } else {
-            msg.innerHTML = "LOSE! <span style='color:#ff4444'>HOST HIGHER.</span>";
+            msgEl.innerHTML = '<span style="color:red">LOSE! HOST WIN</span>';
         }
         updateUI();
     }
 
     function updateUI() {
-        document.getElementById("balance").innerText = points;
-        localStorage.setItem("saldo_reel", points);
+        document.getElementById('saldo').innerText = points;
+        localStorage.setItem("saldo_v2", points);
     }
 </script>
 
