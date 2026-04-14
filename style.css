@@ -1,87 +1,117 @@
+:root {
+    --gold: #ffd700;
+    --red-dark: #6e0000;
+}
+
 body {
-    background-color: #0b0b0b;
+    background: #000;
     color: white;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
     display: flex;
     justify-content: center;
-    padding: 20px;
+    overflow: hidden;
 }
 
-.game-wrapper {
-    background: #1e1e1e;
-    padding: 15px;
-    border-radius: 15px;
-    border: 2px solid #333;
+.game-container {
+    width: 100%;
     max-width: 400px;
-    text-align: center;
-}
-
-.logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: #ffd700;
-    margin-bottom: 10px;
-}
-
-.logo span { color: #ff4500; }
-
-.balance-display {
-    background: #000;
-    padding: 8px;
-    border-radius: 5px;
-    color: #00ff00;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 5 Kolom */
-    gap: 6px;
-    background: #7b0000; /* Warna merah gelap khas Mahjong Ways */
+    background: #1a1a1a;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
     padding: 10px;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 900;
+    text-align: center;
+    color: var(--gold);
+    text-shadow: 2px 2px #000;
+}
+
+.red { color: #ff0000; }
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    margin: 10px 0;
+}
+
+.stat-box {
+    background: #333;
+    padding: 5px 15px;
+    border-radius: 20px;
+    border: 1px solid var(--gold);
+    font-size: 14px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 4px;
+    background: var(--red-dark);
+    padding: 8px;
     border-radius: 8px;
-    margin-bottom: 15px;
+    flex-grow: 1;
 }
 
 .tile {
-    aspect-ratio: 3/4;
     background: #fff;
     border-radius: 4px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 30px;
+    font-size: 32px;
     color: #000;
     box-shadow: inset 0 -4px 0 #ccc;
-    transition: transform 0.1s;
+    position: relative;
+    transition: 0.2s;
 }
 
-/* Simbol Emas */
 .tile.gold {
-    background: linear-gradient(to bottom, #fff700, #ffba00);
+    background: linear-gradient(135deg, #fff700, #ff8c00);
     box-shadow: inset 0 -4px 0 #b8860b;
 }
 
-/* Animasi Menang */
-.tile.win-glow {
-    animation: glow 0.4s infinite alternate;
-    z-index: 10;
+/* Animasi Spin */
+.spinning {
+    filter: blur(4px);
+    transform: translateY(10px);
+    opacity: 0.7;
 }
 
-@keyframes glow {
-    from { transform: scale(1); box-shadow: 0 0 10px gold; }
-    to { transform: scale(1.1); box-shadow: 0 0 20px gold; }
+/* Animasi Menang */
+.win-animate {
+    animation: bounce 0.5s infinite alternate;
+    z-index: 10;
+    border: 2px solid var(--gold);
+}
+
+@keyframes bounce {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+}
+
+.controls {
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #spin-btn {
-    background: #ffd700;
+    background: linear-gradient(to bottom, #ffe066, #ffcc00);
     border: none;
-    padding: 15px 40px;
-    border-radius: 30px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
     font-weight: bold;
+    font-size: 16px;
     cursor: pointer;
-    font-size: 18px;
+    box-shadow: 0 5px 15px rgba(255, 204, 0, 0.4);
 }
 
-#spin-btn:disabled { background: #555; cursor: not-allowed; }
+#spin-btn:disabled { background: #555; box-shadow: none; color: #888; }
