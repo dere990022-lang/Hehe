@@ -2,28 +2,30 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mahjong Ways Clone</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mahjong Ways Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div class="game-wrapper">
+    <div class="game-container">
         <div class="header">
-            <div class="logo">MAHJONG <span>WAYS II</span></div>
-            <div class="balance-display">POIN: <span id="balance">1000</span></div>
-            <div id="status-msg">Siap Main?</div>
+            <div class="title">MAHJONG <span class="red">WAYS</span></div>
+            <div class="stats">
+                <div class="stat-box">SALDO: <span id="balance">1000</span></div>
+                <div class="stat-box">MENANG: <span id="last-win">0</span></div>
+            </div>
         </div>
 
-        <div id="slot-grid" class="grid-container">
+        <div id="slot-grid" class="grid">
             </div>
 
-        <div class="footer-controls">
-            <div class="bet-info">BET: 10</div>
-            <button id="spin-btn" onclick="handleSpin()">SPIN</button>
+        <div class="controls">
+            <div class="bet-control">BET: 10</div>
+            <button id="spin-btn" onclick="startSpin()">PUTAR</button>
         </div>
+        <p id="info-text">Siap untuk menang?</p>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
+
