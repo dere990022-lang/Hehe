@@ -2,161 +2,291 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adu Angka - House Always Wins</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Adu Angka: KING 0 (45%)</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Consolas', monospace; }
-        body { 
-            background: #0a0a0a; color: #00ff00; 
-            display: flex; justify-content: center; align-items: center; 
-            height: 100vh; margin: 0; 
-        }
-
-        .container {
-            background: #111; width: 95%; max-width: 400px;
-            padding: 25px; border: 2px solid #00ff00; border-radius: 5px;
-            text-align: center; box-shadow: 0 0 15px #00ff0044;
-        }
-
-        .saldo-box { font-size: 24px; margin-bottom: 20px; border-bottom: 1px dashed #00ff00; padding-bottom: 10px; }
+        /* CSS RESET & MODERN STYLING */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
-        .arena {
-            display: flex; justify-content: space-around; align-items: center;
-            margin: 20px 0; background: #000; padding: 20px; border-radius: 4px;
+        body { 
+            background: #121212; 
+            color: white; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh;
+            overflow: hidden;
         }
 
-        .label { font-size: 12px; color: #888; margin-bottom: 5px; }
-        .num { font-size: 48px; font-weight: bold; color: #fff; }
-        .zero-king { color: #ffcc00; text-shadow: 0 0 10px #ffcc00; }
+        /* CONTAINER UTAMA */
+        .game-card {
+            background: #1e1e1e;
+            width: 90%;
+            max-width: 420px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            border: 1px solid #333;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
-        input {
-            width: 100%; padding: 12px; background: #000; color: #00ff00;
-            border: 1px solid #00ff00; border-radius: 3px; margin-bottom: 15px;
+        /* HEADER (TITLE & SALDO) */
+        .header {
+            background: linear-gradient(180deg, #2a2a2a 0%, #1e1e1e 100%);
+            padding: 15px 20px;
             text-align: center;
+            border-bottom: 1px solid #333;
         }
 
-        button {
-            width: 100%; padding: 15px; background: #00ff00; color: #000;
-            border: none; border-radius: 3px; font-weight: bold;
-            font-size: 18px; cursor: pointer;
+        .title { font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #aaa; margin-bottom: 8px; }
+        .title span { color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+
+        .balance-box {
+            background: #000;
+            padding: 10px;
+            border-radius: 12px;
+            display: inline-block;
+            border: 1px solid #444;
+        }
+        .balance-label { font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 2px; }
+        .balance-val { font-size: 24px; font-weight: bold; color: #00ff88; }
+
+        /* ARENA BERTANDING */
+        .arena {
+            display: grid;
+            grid-template-columns: 1fr 40px 1fr;
+            align-items: center;
+            padding: 30px 20px;
+            background: #181818;
         }
 
-        button:active { background: #00cc00; }
+        .player-box, .host-box {
+            background: #252525;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #333;
+            transition: 0.3s;
+        }
 
-        #status { margin-top: 20px; font-weight: bold; min-height: 24px; }
-        .win-x3 { animation: flash 0.3s infinite; color: #ffcc00; }
-        @keyframes flash { 50% { opacity: 0.5; } }
+        .role-label { font-size: 12px; font-weight: bold; color: #ffd700; text-transform: uppercase; margin-bottom: 10px; opacity: 0.7; }
+        
+        .num-display { font-size: 60px; font-weight: 900; color: #fff; transition: 0.2s; }
+        
+        /* Spesial buat angka 0 */
+        .num-display.king {
+            color: #ffd700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            font-size: 70px;
+        }
+
+        .vs-divider { font-size: 20px; font-weight: 900; color: #444; font-style: italic; text-align: center; }
+
+        /* KONTROL (INPUT & TOMBOL) */
+        .controls {
+            padding: 20px;
+            background: #1e1e1e;
+            border-top: 1px solid #333;
+            margin-top: auto;
+        }
+
+        .input-group { position: relative; margin-bottom: 15px; }
+        .currency-label { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
+        
+        input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            background: #121212;
+            border: 1px solid #444;
+            color: #ffd700;
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: left;
+            transition: 0.2s;
+        }
+        input:focus { border-color: #ffd700; outline: none; background: #000; }
+
+        #spin-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #b8860b, #ffd700);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-weight: bold;
+            font-size: 18px;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+            transition: 0.1s;
+        }
+        #spin-btn:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(255, 215, 0, 0.3); }
+        #spin-btn:disabled { background: #444; color: #888; box-shadow: none; cursor: not-allowed; }
+
+        /* PESAN STATUS */
+        .status-bar {
+            padding: 10px 20px;
+            text-align: center;
+            min-height: 40px;
+            background: #222;
+            border-top: 1px solid #333;
+            font-size: 14px;
+        }
+        #msg { font-weight: bold; }
+
+        /* ANIMASI & HELPER CLASSES */
+        .spinning { animation: blur 0.1s infinite; opacity: 0.5; }
+        @keyframes blur { 0% { filter: blur(2px); } 50% { filter: blur(5px); } 100% { filter: blur(2px); } }
+
+        .jackpot-animate { animation: jack 0.5s infinite; color: #ffd700; font-size: 16px; }
+        @keyframes jack { 0% { transform: scale(1); } 50% { transform: scale(1.1); text-shadow: 0 0 10px gold; } 100% { transform: scale(1); } }
+        
+        .rule-footer { font-size: 9px; color: #444; padding: 10px; text-align: center; background: #1a1a1a; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="saldo-box">CREDITS: <span id="balance">1000</span></div>
+<div class="game-card">
+    <div class="header">
+        <div class="title">TANDING <span>KING 0</span></div>
+        <div class="balance-box">
+            <div class="balance-label">CREDITS</div>
+            <div id="balance" class="balance-val">1000</div>
+        </div>
+    </div>
 
     <div class="arena">
-        <div>
-            <div class="label">PLAYER</div>
-            <div id="p-display" class="num">?</div>
+        <div id="p-box" class="player-box">
+            <div class="role-label">PLAYER</div>
+            <div id="p-display" class="num-display">?</div>
         </div>
-        <div style="color: #444;">VS</div>
-        <div>
-            <div class="label">HOST</div>
-            <div id="h-display" class="num">?</div>
+        <div class="vs-divider">VS</div>
+        <div id="h-box" class="host-box">
+            <div class="role-label">HOST</div>
+            <div id="h-display" class="num-display">?</div>
         </div>
     </div>
 
-    <input type="number" id="bet" placeholder="ENTER BET AMOUNT">
-    <button onclick="tanding()">START BATTLE</button>
-
-    <div id="status"></div>
-    <div style="font-size: 10px; color: #444; margin-top: 15px;">
-        WIN RATE: 40% | DRAW = HOST WIN | 0 = KING (x3)
+    <div class="status-bar">
+        <p id="msg"></p>
     </div>
+
+    <div class="controls">
+        <div class="input-group">
+            <div class="currency-label">$</div>
+            <input type="number" id="bet-input" placeholder="Isi Jumlah Bet" min="1">
+        </div>
+        <button id="spin-btn" onclick="play()">GAS TANDING!</button>
+    </div>
+    <div class="rule-footer">RANGE: 0-30 | WIN: 45% | DRAW = HOST WIN | 0 = KING (x3)</div>
 </div>
 
 <script>
-    let points = parseInt(localStorage.getItem("points_hardcore")) || 1000;
-    updateUI();
+    let points = parseInt(localStorage.getItem("saldo_premium")) || 1000;
+    document.getElementById("balance").innerText = points;
 
-    function tanding() {
-        const betAmt = parseInt(document.getElementById("bet").value);
-        const status = document.getElementById("status");
+    const msgEl = document.getElementById("msg");
+    const pDisp = document.getElementById("p-display");
+    const hDisp = document.getElementById("h-display");
+    const pBox = document.getElementById("p-box");
+    const hBox = document.getElementById("h-box");
+    const spinBtn = document.getElementById("spin-btn");
 
-        if (isNaN(betAmt) || betAmt <= 0) return alert("Input Bet!");
-        if (betAmt > points) return alert("Not enough credits!");
+    function play() {
+        const bet = parseInt(document.getElementById("bet-input").value);
 
-        points -= betAmt;
+        if (isNaN(bet) || bet <= 0) return alert("Masukkan jumlah Bet!");
+        if (bet > points) return alert("Saldo gak cukup, Don!");
+
+        // Reset tampilan
+        points -= bet;
         updateUI();
-        status.innerText = "ROLLING...";
-        status.className = "";
+        msgEl.innerText = "Mengadu angka...";
+        msgEl.className = "";
+        pDisp.className = "num-display spinning";
+        hDisp.className = "num-display spinning";
+        pBox.style.borderColor = "#333";
+        hBox.style.borderColor = "#333";
+        spinBtn.disabled = true;
 
-        // Animasi angka acak
-        let count = 0;
+        // Animasi rolling
         let roll = setInterval(() => {
-            document.getElementById("p-display").innerText = Math.floor(Math.random() * 31);
-            document.getElementById("h-display").innerText = Math.floor(Math.random() * 31);
-            count++;
-            if (count > 15) {
-                clearInterval(roll);
-                kalkulasi(betAmt);
-            }
+            pDisp.innerText = Math.floor(Math.random() * 31);
+            hDisp.innerText = Math.floor(Math.random() * 31);
         }, 50);
+
+        setTimeout(() => {
+            clearInterval(roll);
+            spinBtn.disabled = false;
+            pDisp.className = "num-display";
+            hDisp.className = "num-display";
+            result(bet);
+        }, 1200); // 1.2 detik roll
     }
 
-    function kalkulasi(bet) {
-        const pDisplay = document.getElementById("p-display");
-        const hDisplay = document.getElementById("h-display");
-        const status = document.getElementById("status");
-
+    function result(bet) {
         let pNum, hNum;
         
-        // SISTEM PROBABILITAS 40/60
-        const luck = Math.random(); // 0.0 - 1.0
+        // SISTEM PROBABILITAS 45% PLAYER WIN
+        const rate = Math.random(); // 0.0 - 1.0
         
-        if (luck < 0.4) {
-            // PLAYER MENANG (40% Peluang)
+        if (rate < 0.45) {
+            // PLAYER MENANG (45% Peluang)
             pNum = Math.floor(Math.random() * 31);
             if (pNum === 0) {
-                hNum = Math.floor(Math.random() * 30) + 1; // Host nggak boleh 0
+                hNum = Math.floor(Math.random() * 30) + 1; // Host gak boleh 0
             } else {
                 hNum = Math.floor(Math.random() * pNum); // Host harus lebih kecil
             }
         } else {
-            // HOST MENANG (60% Peluang - Termasuk Seri)
+            // HOST MENANG (55% Peluang - Termasuk Seri)
             hNum = Math.floor(Math.random() * 31);
             if (hNum === 0) {
                 pNum = Math.floor(Math.random() * 31); // 0 vs 0 tetap Host Win
             } else {
                 // Host punya angka 1-30, Player harus lebih kecil atau SAMA, dan bukan 0
-                pNum = Math.floor(Math.random() * hNum) + 1; 
-                // Jika ingin memaksa seri (biar host menang), sesekali buat pNum = hNum
-                if (Math.random() > 0.5) pNum = hNum;
+                pNum = Math.floor(Math.random() * (hNum + 1)); 
+                // Jika iseng memaksa seri
+                if (Math.random() > 0.6) pNum = hNum;
+                // Pastikan player bukan 0 saat host win, kecuali host juga 0 (case diatas)
+                if (pNum === 0 && hNum !== 0) pNum = 1;
             }
         }
 
         // Tampilkan Hasil
-        pDisplay.innerText = pNum;
-        hDisplay.innerText = hNum;
+        pDisp.innerText = pNum;
+        hDisp.innerText = hNum;
 
-        // Visual check for 0
-        pDisplay.classList.toggle("zero-king", pNum === 0);
-        hDisplay.classList.toggle("zero-king", hNum === 0);
+        // Visual King (0)
+        if (pNum === 0) pDisp.classList.add("king");
+        if (hNum === 0) hDisp.classList.add("king");
 
         // LOGIKA PEMENANG
         if (pNum === hNum) {
-            status.innerHTML = '<span style="color:red">DRAW! HOST WIN.</span>';
+            // SERI = HOST MENANG
+            msgEl.innerHTML = '<span style="color:#ff4444">DRAW! HOST WIN.</span>';
+            hBox.style.borderColor = "#ff4444";
         } else if (pNum === 0) {
+            // Player King 0 (x3)
             const win = bet * 3;
             points += win;
-            status.innerHTML = `<span class="win-x3">JACKPOT 0! +${win}</span>`;
+            msgEl.innerHTML = `<span class="jackpot-animate">JACKPOT KING 0! +${win}</span>`;
+            pBox.style.borderColor = "#ffd700";
         } else if (hNum === 0) {
-            status.innerHTML = '<span style="color:red">LOSE! HOST IS KING 0.</span>';
+            // Host King 0
+            msgEl.innerHTML = '<span style="color:#ff4444">LOSE! HOST IS KING 0.</span>';
+            hBox.style.borderColor = "#ffd700";
         } else if (pNum > hNum) {
+            // Player Menang Biasa (x2)
             const win = bet * 2;
             points += win;
-            status.innerHTML = `<span style="color:#00ff00">WIN! +${win}</span>`;
+            msgEl.innerHTML = `<span style="color:#00ff88">WIN Biasa! +${win}</span>`;
+            pBox.style.borderColor = "#00ff88";
         } else {
-            status.innerHTML = '<span style="color:red">LOSE! HOST HIGHER.</span>';
+            // Host Menang Biasa
+            msgEl.innerHTML = '<span style="color:#ff4444">LOSE! Angka Host lebih besar.</span>';
+            hBox.style.borderColor = "#ff4444";
         }
 
         updateUI();
@@ -164,7 +294,7 @@
 
     function updateUI() {
         document.getElementById("balance").innerText = points;
-        localStorage.setItem("points_hardcore", points);
+        localStorage.setItem("saldo_premium", points);
     }
 </script>
 
