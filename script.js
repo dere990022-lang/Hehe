@@ -2,101 +2,119 @@ const symbols = ['🀄', '🀅', '🀆', '🀐', '🀙', '🀛', '🀃'];
 let points = 1000;
 let isSpinning = false;
 
-// Munculkan grid kosong saat pertama kali buka
-function initGame() {
-    const grid = document.getElementById('slot-grid');
-    grid.innerHTML = '';
+const gridEl = document.getElementById('slot-grid');
+const balanceEl = document.getElementById('balance');
+const lastWinEl = document.getElementById('last-win');
+const infoText = document.getElementById('info-text');
+
+// Inisialisasi Grid Awal
+function init() {
+    gridEl.innerHTML = '';
     for (let i = 0; i < 20; i++) {
         const div = document.createElement('div');
         div.className = 'tile';
-        div.innerText = '?';
-        grid.appendChild(div);
+        div.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+        gridEl.appendChild(div);
     }
 }
 
-async function handleSpin() {
+async function startSpin() {
     if (isSpinning || points < 10) return;
 
     isSpinning = true;
     points -= 10;
     updateUI();
     
-    document.getElementById('status-msg').innerText = "Memutar...";
-    const grid = document.getElementById('slot-grid');
-    grid.innerHTML = '';
+    infoText.innerText = "Memutar...";
+    lastWinEl.innerText = "0";
 
-    // Data grid (5 kolom x 4 baris)
-    const gridData = [];
+    // Beri efek spinning ke semua tile
+    const allTiles = document.querySelectorAll('.tile');
+    allTiles.forEach(t => t.classList.add('spinning'));
 
-    // Mengacak data
+    // Delay untuk efek putar
+    setTimeout(() => {
+        generateResults();
+    }, 800);
+}
+
+function generateResults() {
+    gridEl.innerHTML = '';
+    const matrix = [];
+
+    // Buat data matrix 4 baris x 5 kolom
     for (let r = 0; r < 4; r++) {
-        gridData[r] = [];
+        matrix[r] = [];
         for (let c = 0; c < 5; c++) {
-            gridData[r][c] = {
+            matrix[r][c] = {
                 symbol: symbols[Math.floor(Math.random() * symbols.length)],
-                isGold: Math.random() > 0.8 // 20% peluang emas
+                isGold: Math.random() > 0.85
             };
         }
     }
 
-    // Render ke layar
-    for (let c = 0; c < 5; c++) {
-        for (let r = 0; r < 4; r++) {
-            const item = gridData[r][c];
+    // Render ke HTML (Penting: urutan baris-kolom harus pas)
+    for (let r = 0; r < 4; r++) {
+        for (let c = 0; c < 5; c++) {
+            const data = matrix[r][c];
             const div = document.createElement('div');
-            div.className = `tile ${item.isGold ? 'gold' : ''}`;
-            div.id = `t-${r}-${c}`;
-            div.innerText = item.symbol;
-            grid.appendChild(div);
+            div.className = `tile ${data.isGold ? 'gold' : ''}`;
+            div.id = `tile-${r}-${c}`;
+            div.innerText = data.symbol;
+            gridEl.appendChild(div);
         }
     }
 
-    // Cek Kemenangan (Logic sederhana: 3 kolom pertama sama)
-    checkWins(gridData);
-    
+    checkWins(matrix);
     isSpinning = false;
 }
 
-function checkWins(data) {
-    let winCount = 0;
-    
-    // Cek simbol dari baris kolom 0
-    for (let r = 0; r < 4; r++) {
-        const matchSymbol = data[r][0].symbol;
-        let matches = [ {r, c: 0} ];
+function checkWins(matrix) {
+    let totalWin = 0;
+    let winPositions = new Set();
 
-        // Cek kolom 1, 2, dst
+    // Logika Ways: Cek simbol dari kolom 0 ke kanan
+    for (let r = 0; r < 4; r++) {
+        const startSymbol = matrix[r][0].symbol;
+        let matches = [{r, c: 0}];
+
         for (let c = 1; c < 5; c++) {
-            let found = false;
+            let columnMatches = [];
             for (let r2 = 0; r2 < 4; r2++) {
-                if (data[r2][c].symbol === matchSymbol) {
-                    matches.push({r: r2, c});
-                    found = true;
+                if (matrix[r2][c].symbol === startSymbol) {
+                    columnMatches.push({r: r2, c});
                 }
             }
-            if (!found) break;
+            if (columnMatches.length > 0) {
+                matches.push(...columnMatches);
+            } else {
+                break;
+            }
         }
 
-        // Jika minimal 3 kolom berurutan ada simbol yang sama
-        if (matches.length >= 3) {
-            matches.forEach(pos => {
-                document.getElementById(`t-${pos.r}-${pos.c}`).classList.add('win-glow');
-            });
-            winCount += matches.length * 10;
+        // Minimal 3 kolom berurutan
+        const uniqueCols = new Set(matches.map(m => m.c));
+        if (uniqueCols.size >= 3) {
+            matches.forEach(m => winPositions.add(`${m.r}-${m.c}`));
+            totalWin += uniqueCols.size * 15;
         }
     }
 
-    if (winCount > 0) {
-        points += winCount;
-        document.getElementById('status-msg').innerText = `MENANG +${winCount}!`;
-        updateUI();
+    if (totalWin > 0) {
+        winPositions.forEach(pos => {
+            document.getElementById(`tile-${pos}`).classList.add('win-animate');
+        });
+        points += totalWin;
+        lastWinEl.innerText = totalWin;
+        infoText.innerText = "BIG WIN!";
     } else {
-        document.getElementById('status-msg').innerText = "Coba Lagi";
+        infoText.innerText = "Coba lagi...";
     }
+    updateUI();
 }
 
 function updateUI() {
-    document.getElementById('balance').innerText = points;
+    balanceEl.innerText = points;
 }
 
-initGame();
+init();
