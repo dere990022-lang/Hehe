@@ -1,62 +1,87 @@
 body {
-    background-color: #1a1a1a;
+    background-color: #0b0b0b;
     color: white;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.game-wrapper {
+    background: #1e1e1e;
+    padding: 15px;
+    border-radius: 15px;
+    border: 2px solid #333;
+    max-width: 400px;
+    text-align: center;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 10px;
+}
+
+.logo span { color: #ff4500; }
+
+.balance-display {
+    background: #000;
+    padding: 8px;
+    border-radius: 5px;
+    color: #00ff00;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 Kolom */
+    gap: 6px;
+    background: #7b0000; /* Warna merah gelap khas Mahjong Ways */
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.tile {
+    aspect-ratio: 3/4;
+    background: #fff;
+    border-radius: 4px;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
+    font-size: 30px;
+    color: #000;
+    box-shadow: inset 0 -4px 0 #ccc;
+    transition: transform 0.1s;
 }
 
-.game-container {
-    text-align: center;
-    background: #2c3e50;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+/* Simbol Emas */
+.tile.gold {
+    background: linear-gradient(to bottom, #fff700, #ffba00);
+    box-shadow: inset 0 -4px 0 #b8860b;
 }
 
-.wheel-container {
-    position: relative;
-    margin: 20px auto;
-    width: 250px;
-    height: 250px;
+/* Animasi Menang */
+.tile.win-glow {
+    animation: glow 0.4s infinite alternate;
+    z-index: 10;
 }
 
-.wheel {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 5px solid #ecf0f1;
-    background: conic-gradient(
-        #27ae60 0deg 30deg, #c0392b 30deg 180deg, #2c3e50 180deg 360deg
-    );
-    transition: transform 4s cubic-bezier(0.1, 0, 0.2, 1);
-}
-
-.pointer {
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 24px;
-    color: #f1c40f;
-}
-
-.controls input, .controls select, .controls button {
-    padding: 10px;
-    margin: 5px;
-    border-radius: 5px;
-    border: none;
+@keyframes glow {
+    from { transform: scale(1); box-shadow: 0 0 10px gold; }
+    to { transform: scale(1.1); box-shadow: 0 0 20px gold; }
 }
 
 #spin-btn {
-    background-color: #f1c40f;
-    cursor: pointer;
+    background: #ffd700;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 30px;
     font-weight: bold;
+    cursor: pointer;
+    font-size: 18px;
 }
 
-#spin-btn:disabled {
-    background-color: #7f8c8d;
-}
+#spin-btn:disabled { background: #555; cursor: not-allowed; }
