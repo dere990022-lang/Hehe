@@ -3,34 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Roulette Game</title>
+    <title>Mahjong Ways Clone</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="game-container">
-        <h1>Roulette Game</h1>
-        
-        <div class="stats">
-            <p>Poin Anda: <span id="user-points">1000</span></p>
+    <div class="game-wrapper">
+        <div class="header">
+            <div class="logo">MAHJONG <span>WAYS II</span></div>
+            <div class="balance-display">POIN: <span id="balance">1000</span></div>
+            <div id="status-msg">Siap Main?</div>
         </div>
 
-        <div class="wheel-container">
-            <div id="wheel" class="wheel"></div>
-            <div class="pointer">▼</div>
-        </div>
+        <div id="slot-grid" class="grid-container">
+            </div>
 
-        <div class="controls">
-            <input type="number" id="bet-amount" placeholder="Jumlah Taruhan" min="10">
-            <select id="bet-choice">
-                <option value="red">Merah (x2)</option>
-                <option value="black">Hitam (x2)</option>
-                <option value="green">Hijau / Angka 0 (x14)</option>
-            </select>
-            <button id="spin-btn">Putar!</button>
+        <div class="footer-controls">
+            <div class="bet-info">BET: 10</div>
+            <button id="spin-btn" onclick="handleSpin()">SPIN</button>
         </div>
-
-        <p id="message"></p>
     </div>
 
     <script src="script.js"></script>
