@@ -3,47 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mahjong Ways: The Real Script</title>
+    <title>MAHJONG WAYS: PRO EDITION</title>
     <style>
-        body { background: #000; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; color: white; font-family: 'Arial', sans-serif; }
-        #game-container { position: relative; border: 4px solid #333; border-radius: 15px; overflow: hidden; background: #0d2b1a; }
+        /* CSS RESET & MODERN DESIGN */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #080808; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; color: white; }
+        
+        #game-wrapper { position: relative; border: 4px solid #ffd700; border-radius: 20px; overflow: hidden; background: #001f0f; box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); }
         canvas { display: block; }
-        .ui-top { position: absolute; top: 0; width: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: space-around; padding: 10px 0; border-bottom: 2px solid #ffd700; }
-        .multiplier-bar { position: absolute; top: 60px; width: 100%; display: flex; justify-content: center; gap: 10px; }
-        .mult { padding: 5px 15px; background: #222; border: 1px solid #444; border-radius: 5px; font-weight: bold; font-size: 14px; transition: 0.3s; }
-        .mult.active { background: #ffd700; color: #000; box-shadow: 0 0 15px #ffd700; transform: scale(1.2); }
-        .controls { margin-top: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        #spin-btn { width: 70px; height: 70px; border-radius: 50%; border: 4px solid #ffd700; background: radial-gradient(#222, #000); color: #ffd700; font-weight: bold; cursor: pointer; font-size: 14px; }
-        #spin-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .stat { text-align: center; }
-        .stat-val { color: #00ff88; font-weight: bold; display: block; font-size: 18px; }
+
+        /* UI TOP: SALDO & MULTIPLIER */
+        .ui-top { position: absolute; top: 0; width: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); padding: 15px 20px; display: flex; flex-direction: column; align-items: center; }
+        .stats { width: 100%; display: flex; justify-content: space-around; margin-bottom: 10px; }
+        .stat-box { text-align: center; }
+        .stat-label { font-size: 10px; color: #888; text-transform: uppercase; }
+        .stat-val { font-size: 20px; font-weight: bold; color: #00ff88; text-shadow: 0 0 10px #00ff88; }
+
+        .mult-bar { display: flex; justify-content: center; gap: 8px; margin-top: 5px; }
+        .mult-btn { padding: 4px 12px; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; font-weight: 900; font-size: 13px; color: #aaa; transition: 0.2s; }
+        .mult-btn.active { background: radial-gradient(#fff, #ffd700, #b8860b); color: #000; border: none; box-shadow: 0 0 15px #ffd700; transform: scale(1.15); }
+
+        /* UI BOTTOM: KONTROL */
+        .controls { margin-top: 15px; display: flex; flex-direction: column; align-items: center; }
+        #spin-btn { width: 80px; height: 80px; border-radius: 50%; border: 4px solid #ffd700; background: radial-gradient(#333, #000); color: #ffd700; font-weight: 900; cursor: pointer; font-size: 16px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: 0.1s; text-transform: uppercase; }
+        #spin-btn:active { transform: scale(0.9) translateY(4px); }
+        #spin-btn:disabled { filter: grayscale(1); opacity: 0.5; }
+        .bet-text { font-size: 12px; color: #aaa; margin-top: 8px; }
+
+        /* HELPER: ANIMASI */
+        .win-glow { animation: glowPulse 0.4s infinite alternate; }
+        @keyframes glowPulse { from { filter: drop-shadow(0 0 5px #ffd700); } to { filter: drop-shadow(0 0 15px #ffd700); } }
     </style>
 </head>
 <body>
 
-<div id="game-container">
+<div id="game-wrapper">
     <div class="ui-top">
-        <div class="stat">SALDO <span id="balance" class="stat-val">1000</span></div>
-        <div class="stat">MENANG <span id="win" class="stat-val">0</span></div>
+        <div class="stats">
+            <div class="stat-box"><div class="stat-label">SALDO</div><div id="balance" class="stat-val">1000</div></div>
+            <div class="stat-box"><div class="stat-label">MENANG</div><div id="win" class="stat-val">0</span></div></div>
+        </div>
+        <div class="mult-bar">
+            <div id="m1" class="mult-btn active">x1</div>
+            <div id="m2" class="mult-btn">x2</div>
+            <div id="m3" class="mult-btn">x3</div>
+            <div id="m5" class="mult-btn">x5</div>
+        </div>
     </div>
     
-    <div class="multiplier-bar">
-        <div id="m1" class="mult active">x1</div>
-        <div id="m2" class="mult">x2</div>
-        <div id="m3" class="mult">x3</div>
-        <div id="m5" class="mult">x5</div>
-    </div>
-
     <canvas id="canvas"></canvas>
 </div>
 
 <div class="controls">
-    <button id="spin-btn" onclick="startSpin()">SPIN</button>
-    <div style="font-size: 12px; color: #888;">BET: 10</div>
+    <button id="spin-btn" onclick="tanding()">SPIN</button>
+    <div class="bet-text">BET: 10</div>
 </div>
 
 <script>
-/** * SCRIPT MAHJONG WAYS V2 - CASCADING ENGINE 
+/** * MAHJONG WAYS: PRO EDITION SCRIPT
+ * Fixing duplicated tiles & premium visuals
  */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -52,191 +70,207 @@ const winEl = document.getElementById('win');
 
 const COLS = 5;
 const ROWS = 4;
-const TILE_W = 70;
-const TILE_H = 90;
+const TILE_W = 75; // Ukuran disesuaikan
+const TILE_H = 100;
 const GAP = 5;
+const UI_TOP_H = 120; // Ruang buat header
 
 canvas.width = (TILE_W + GAP) * COLS + GAP;
-canvas.height = (TILE_H + GAP) * ROWS + GAP + 100; // Extra space for top/bottom
+canvas.height = (TILE_H + GAP) * ROWS + GAP + UI_TOP_H;
 
+// Simbol dengan warna lebih premium
 const SYMBOLS = [
-    { name: 'Fa', color: '#b71c1c', txt: '發' },
+    { name: 'Fa', color: '#b71c1c', txt: '發' }, 
     { name: 'Zhong', color: '#1b5e20', txt: '中' },
     { name: 'Bai', color: '#0d47a1', txt: '白' },
     { name: '9Dot', color: '#e65100', txt: '九' },
-    { name: '5Bam', color: '#33691e', txt: '五' }
+    { name: '5Bam', color: '#33691e', txt: '五' },
+    { name: 'WIND', color: '#4a148c', txt: '北' }
 ];
 
 let balance = 1000;
-let currentMultiplier = 1;
-let isAnimating = false;
-let grid = [];
+let curMult = 1;
+let animating = false;
+let matrix = []; // Grid Matrix [COLS][ROWS] - Kunci anti tumpang tindih
 
-class Tile {
-    constructor(col, row, symbol) {
-        this.col = col;
-        this.row = row;
-        this.symbol = symbol;
-        this.x = GAP + col * (TILE_W + GAP);
-        this.y = -200; // Start from above for cascading
-        this.targetY = 120 + row * (TILE_H + GAP);
-        this.isDestroyed = false;
-        this.speed = 15;
-    }
+function drawTile(x, y, symbol, isWin=false) {
+    ctx.save();
+    ctx.translate(x, y);
 
-    update() {
-        if (this.y < this.targetY) {
-            this.y += this.speed;
-            if (this.y > this.targetY) this.y = this.targetY;
-            return true;
-        }
-        return false;
-    }
+    if(isWin) ctx.filter = 'drop-shadow(0 0 10px #ffd700)';
 
-    draw() {
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        
-        // Body Tile
-        ctx.fillStyle = '#f5f5f5';
-        ctx.beginPath();
-        ctx.roundRect(0, 0, TILE_W, TILE_H, 5);
-        ctx.fill();
-        
-        // Green Border
-        ctx.strokeStyle = '#2e7d32';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(4, 4, TILE_W - 8, TILE_H - 8);
+    // Tile Body (Premium gradient putih)
+    const grd = ctx.createLinearGradient(0, 0, 0, TILE_H);
+    grd.addColorStop(0, '#ffffff'); grd.addColorStop(1, '#e6e6e6');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.roundRect(0, 0, TILE_W, TILE_H, 6); ctx.fill();
 
-        // Text Symbol (Bukan Emoji)
-        ctx.fillStyle = this.symbol.color;
-        ctx.font = 'bold 30px serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(this.symbol.txt, TILE_W/2, TILE_H/2);
-        
-        ctx.restore();
-    }
+    // Bottom shadow
+    ctx.fillStyle = '#b3b3b3'; ctx.fillRect(4, TILE_H-8, TILE_W-8, 5);
+
+    // Green Inner Border
+    ctx.strokeStyle = '#2e7d32'; ctx.lineWidth = 2.5; ctx.strokeRect(5, 5, TILE_W-10, TILE_H-10);
+
+    // Symbol Text
+    ctx.fillStyle = symbol.color;
+    ctx.font = 'bold 36px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(symbol.txt, TILE_W/2, TILE_H/2);
+
+    ctx.restore();
 }
 
-function initGrid() {
-    grid = [];
+function initMatrix() {
+    matrix = [];
     for (let c = 0; c < COLS; c++) {
+        matrix[c] = [];
         for (let r = 0; r < ROWS; r++) {
-            grid.push(new Tile(c, r, SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]));
+            matrix[c][r] = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
         }
     }
 }
 
-function updateMultipliers() {
-    [1, 2, 3, 5].forEach(m => {
-        document.getElementById('m' + m).className = (m === currentMultiplier) ? 'mult active' : 'mult';
-    });
+function updateMultUI() {
+    [1, 2, 3, 5].forEach(m => document.getElementById('m'+m).className = (m === curMult) ? 'mult-btn active' : 'mult-btn');
 }
 
-async function startSpin() {
-    if (isAnimating || balance < 10) return;
+async function tanding() {
+    if (animating || balance < 10) return;
     
     balance -= 10;
-    currentMultiplier = 1;
+    curMult = 1;
     balanceEl.innerText = balance;
     winEl.innerText = '0';
-    updateMultipliers();
+    updateMultUI();
     
-    isAnimating = true;
+    animating = true;
     document.getElementById('spin-btn').disabled = true;
     
-    initGrid();
-    requestAnimationFrame(gameLoop);
+    initMatrix();
+    
+    // Animasi putar (Blur sebentar)
+    let spinCount = 0;
+    let roll = setInterval(() => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.filter = 'blur(4px)';
+        for(let c=0; c<COLS; c++) {
+            for(let r=0; r<ROWS; r++) {
+                const x = GAP + c * (TILE_W+GAP);
+                const y = UI_TOP_H + GAP + r * (TILE_H+GAP);
+                drawTile(x, y, SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
+            }
+        }
+        spinCount++;
+        if(spinCount > 10) { clearInterval(roll); ctx.filter = 'none'; drawGame(); checkWins(); }
+    }, 60);
 }
 
-function gameLoop() {
+function drawGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    let moving = false;
-    
-    grid.forEach(tile => {
-        if (tile.update()) moving = true;
-        tile.draw();
-    });
-
-    if (moving) {
-        requestAnimationFrame(gameLoop);
-    } else {
-        checkWins();
+    for (let c = 0; c < COLS; c++) {
+        for (let r = 0; r < ROWS; r++) {
+            if(matrix[c][r]) {
+                const x = GAP + c * (TILE_W + GAP);
+                const y = UI_TOP_H + GAP + r * (TILE_H + GAP);
+                drawTile(x, y, matrix[c][r]);
+            }
+        }
     }
 }
 
 function checkWins() {
-    // Logika Ways Sederhana: Minimal 3 di kolom berurutan
-    let winOccurred = false;
-    let winAmount = 0;
-    
-    // Check Fa (Simbol paling tinggi)
-    const matches = [];
-    for(let c=0; c<COLS; c++) {
-        const colMatches = grid.filter(t => t.col === c && t.symbol.name === 'Fa' && !t.isDestroyed);
-        if(colMatches.length > 0) matches.push(colMatches);
-        else break;
+    let toDestroy = new Set();
+    let curWin = 0;
+
+    // Logika Ways: Minimal 3 di kolom berurutan
+    for(let c=0; c < COLS; c++) {
+        for(let r=0; r < ROWS; r++) {
+            if(!matrix[c][r]) continue;
+            const targetName = matrix[c][r].name;
+            let matches = [`${c}-${r}`];
+
+            // Cek ke kanan
+            for(let nc = c+1; nc < COLS; nc++) {
+                let foundInCol = false;
+                for(let nr = 0; nr < ROWS; nr++) {
+                    if(matrix[nc][nr] && matrix[nc][nr].name === targetName) {
+                        matches.push(`${nc}-${nr}`);
+                        foundInCol = true;
+                    }
+                }
+                if(!foundInCol) break;
+            }
+
+            if(new Set(matches.map(m => m.split('-')[0])).size >= 3) {
+                matches.forEach(m => toDestroy.add(m));
+                curWin += 20 * curMult; // Hadiah disesuaikan
+            }
+        }
     }
 
-    if(matches.length >= 3) {
-        winOccurred = true;
-        matches.forEach(colArr => {
-            colArr.forEach(t => t.isDestroyed = true);
+    if(toDestroy.size > 0) {
+        // Efek Menang (Gambar ulang yang menang pake Drop Shadow)
+        drawGame();
+        toDestroy.forEach(pos => {
+            const [c, r] = pos.split('-').map(Number);
+            const x = GAP + c * (TILE_W + GAP);
+            const y = UI_TOP_H + GAP + r * (TILE_H + GAP);
+            drawTile(x, y, matrix[c][r], true);
         });
-        winAmount = matches.length * 10 * currentMultiplier;
-    }
 
-    if(winOccurred) {
-        balance += winAmount;
-        winEl.innerText = winAmount;
+        // Update Poin & UI
+        balance += curWin;
         balanceEl.innerText = balance;
-        
-        // Hapus yang menang & Cascading
+        winEl.innerText = curWin;
+
+        // CASCADING ENGINE (KUNCI ANTI EROR TUMPANG TINDIH)
         setTimeout(() => {
-            grid = grid.filter(t => !t.isDestroyed);
-            
-            // Re-order rows (Ubin atas jatuh ke bawah)
-            for(let c=0; c<COLS; c++) {
-                let tilesInCol = grid.filter(t => t.col === c).sort((a,b) => b.row - a.row);
-                tilesInCol.forEach((t, i) => {
-                    t.row = ROWS - 1 - i;
-                    t.targetY = 120 + t.row * (TILE_H + GAP);
-                });
+            // Hapus yang menang di Matrix
+            toDestroy.forEach(pos => {
+                const [c, r] = pos.split('-').map(Number);
+                matrix[c][r] = null;
+            });
+
+            // Ubin atas JATUH ke bawah (Re-order Matrix per kolom)
+            for(let c=0; c < COLS; c++) {
+                // Ambil ubin yang masih ada, urutin dari baris paling bawah
+                let tilesInCol = [];
+                for(let r = ROWS-1; r >= 0; r--) {
+                    if(matrix[c][r]) tilesInCol.push(matrix[c][r]);
+                }
                 
-                // Isi kekosongan dari atas
-                while(tilesInCol.length < ROWS) {
-                    let newRow = ROWS - 1 - tilesInCol.length;
-                    let newTile = new Tile(c, newRow, SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
-                    grid.push(newTile);
-                    tilesInCol.push(newTile);
+                // Isi kembali matrix per kolom dari bawah
+                for(let r = ROWS-1; r >= 0; r--) {
+                    let tileIdx = ROWS - 1 - r;
+                    if(tileIdx < tilesInCol.length) {
+                        matrix[c][r] = tilesInCol[tileIdx];
+                    } else {
+                        // Slot kosong di atas diisi ubin baru
+                        matrix[c][r] = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+                    }
                 }
             }
-            
-            // Naikkan multiplier
-            if(currentMultiplier === 1) currentMultiplier = 2;
-            else if(currentMultiplier === 2) currentMultiplier = 3;
-            else currentMultiplier = 5;
-            
-            updateMultipliers();
-            requestAnimationFrame(gameLoop);
-        }, 500);
+
+            // Naikkan Multiplier
+            if(curMult === 1) curMult = 2; else if(curMult === 2) curMult = 3; else curMult = 5;
+            updateMultUI();
+
+            // Gambar ulang hasil runtuhan & Cek lagi
+            ctx.filter = 'none'; // Reset blur
+            drawGame();
+            checkWins(); // Cek kemenangan beruntun
+
+        }, 800);
     } else {
-        isAnimating = false;
+        // Selesai, gak ada menang lagi
+        animating = false;
         document.getElementById('spin-btn').disabled = false;
+        canvas.style.borderColor = "#ffd700"; // Reset border
     }
 }
 
-initGrid();
-drawInit();
-
-function drawInit() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    grid.forEach(t => {
-        t.y = t.targetY;
-        t.draw();
-    });
-}
+initMatrix();
+drawGame(); // Tampilan awal
 </script>
 
 </body>
