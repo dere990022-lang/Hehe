@@ -3,163 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adu Angka - 0 is THE KING</title>
+    <title>Adu Angka - House Always Wins</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Courier New', Courier, monospace; }
+        * { box-sizing: border-box; font-family: 'Consolas', monospace; }
         body { 
-            background: #050505; color: #fff; 
+            background: #0a0a0a; color: #00ff00; 
             display: flex; justify-content: center; align-items: center; 
             height: 100vh; margin: 0; 
         }
 
-        .wrapper {
+        .container {
             background: #111; width: 95%; max-width: 400px;
-            padding: 20px; border: 3px solid #444; border-radius: 10px;
-            text-align: center; box-shadow: 0 0 20px rgba(0,255,0,0.1);
+            padding: 25px; border: 2px solid #00ff00; border-radius: 5px;
+            text-align: center; box-shadow: 0 0 15px #00ff0044;
         }
 
-        .display-saldo {
-            font-size: 22px; color: #0f0; margin-bottom: 20px;
-            text-shadow: 0 0 5px #0f0;
-        }
-
-        .board {
+        .saldo-box { font-size: 24px; margin-bottom: 20px; border-bottom: 1px dashed #00ff00; padding-bottom: 10px; }
+        
+        .arena {
             display: flex; justify-content: space-around; align-items: center;
-            background: #222; padding: 20px 10px; border-radius: 8px;
-            margin-bottom: 20px; border: 1px solid #333;
+            margin: 20px 0; background: #000; padding: 20px; border-radius: 4px;
         }
 
-        .side { flex: 1; }
-        .val { 
-            font-size: 45px; font-weight: bold; margin: 10px 0; 
-            color: #fff;
-        }
-        .king { color: #ffcc00; text-shadow: 0 0 10px #ffcc00; font-size: 55px; }
+        .label { font-size: 12px; color: #888; margin-bottom: 5px; }
+        .num { font-size: 48px; font-weight: bold; color: #fff; }
+        .zero-king { color: #ffcc00; text-shadow: 0 0 10px #ffcc00; }
 
         input {
-            width: 100%; padding: 12px; background: #000; color: #0f0;
-            border: 1px solid #0f0; border-radius: 5px; margin-bottom: 10px;
-            text-align: center; font-size: 18px;
+            width: 100%; padding: 12px; background: #000; color: #00ff00;
+            border: 1px solid #00ff00; border-radius: 3px; margin-bottom: 15px;
+            text-align: center;
         }
 
         button {
-            width: 100%; padding: 15px; background: #0f0; color: #000;
-            border: none; border-radius: 5px; font-weight: bold;
+            width: 100%; padding: 15px; background: #00ff00; color: #000;
+            border: none; border-radius: 3px; font-weight: bold;
             font-size: 18px; cursor: pointer;
         }
 
-        button:active { background: #0a0; transform: translateY(2px); }
+        button:active { background: #00cc00; }
 
-        #msg { margin-top: 20px; font-size: 16px; font-weight: bold; min-height: 24px; }
-        .x3-notif { color: #ffcc00; animation: blink 0.5s step-end infinite; }
-
-        @keyframes blink { 50% { opacity: 0; } }
+        #status { margin-top: 20px; font-weight: bold; min-height: 24px; }
+        .win-x3 { animation: flash 0.3s infinite; color: #ffcc00; }
+        @keyframes flash { 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
 
-<div class="wrapper">
-    <div class="display-saldo">POIN: <span id="points">1000</span></div>
+<div class="container">
+    <div class="saldo-box">CREDITS: <span id="balance">1000</span></div>
 
-    <div class="board">
-        <div class="side">
-            <small>PLAYER</small>
-            <div id="p-val" class="val">?</div>
+    <div class="arena">
+        <div>
+            <div class="label">PLAYER</div>
+            <div id="p-display" class="num">?</div>
         </div>
-        <div style="font-size: 20px; color: #555;">VS</div>
-        <div class="side">
-            <small>HOST</small>
-            <div id="h-val" class="val">?</div>
+        <div style="color: #444;">VS</div>
+        <div>
+            <div class="label">HOST</div>
+            <div id="h-display" class="num">?</div>
         </div>
     </div>
 
-    <input type="number" id="bet-input" placeholder="JUMLAH BET">
-    <button onclick="gas()">TANDINGKAN!</button>
+    <input type="number" id="bet" placeholder="ENTER BET AMOUNT">
+    <button onclick="tanding()">START BATTLE</button>
 
-    <div id="msg"></div>
-    <p style="font-size: 11px; color: #444; margin-top: 15px;">Rule: 0 beats 1-30 (Win x3). Max: 30.</p>
+    <div id="status"></div>
+    <div style="font-size: 10px; color: #444; margin-top: 15px;">
+        WIN RATE: 40% | DRAW = HOST WIN | 0 = KING (x3)
+    </div>
 </div>
 
 <script>
-    let saldo = parseInt(localStorage.getItem("saldo_king")) || 1000;
+    let points = parseInt(localStorage.getItem("points_hardcore")) || 1000;
     updateUI();
 
-    function gas() {
-        const betInput = document.getElementById("bet-input");
-        const bet = parseInt(betInput.value);
-        const msg = document.getElementById("msg");
-        const pEl = document.getElementById("p-val");
-        const hEl = document.getElementById("h-val");
+    function tanding() {
+        const betAmt = parseInt(document.getElementById("bet").value);
+        const status = document.getElementById("status");
 
-        if (isNaN(bet) || bet <= 0) return alert("Isi bet dulu!");
-        if (bet > saldo) return alert("Poin kurang!");
+        if (isNaN(betAmt) || betAmt <= 0) return alert("Input Bet!");
+        if (betAmt > points) return alert("Not enough credits!");
 
-        saldo -= bet;
+        points -= betAmt;
         updateUI();
-        msg.innerText = "BERADU...";
-        pEl.classList.remove("king");
-        hEl.classList.remove("king");
+        status.innerText = "ROLLING...";
+        status.className = "";
 
-        // Animasi Rolling
-        let spinCount = 0;
+        // Animasi angka acak
+        let count = 0;
         let roll = setInterval(() => {
-            pEl.innerText = Math.floor(Math.random() * 31);
-            hEl.innerText = Math.floor(Math.random() * 31);
-            spinCount++;
-            if (spinCount > 12) {
+            document.getElementById("p-display").innerText = Math.floor(Math.random() * 31);
+            document.getElementById("h-display").innerText = Math.floor(Math.random() * 31);
+            count++;
+            if (count > 15) {
                 clearInterval(roll);
-                finish(bet);
+                kalkulasi(betAmt);
             }
-        }, 60);
+        }, 50);
     }
 
-    function finish(bet) {
-        const pNum = Math.floor(Math.random() * 31); // 0 - 30
-        const hNum = Math.floor(Math.random() * 31);
-        const msg = document.getElementById("msg");
-        const pEl = document.getElementById("p-val");
-        const hEl = document.getElementById("h-val");
+    function kalkulasi(bet) {
+        const pDisplay = document.getElementById("p-display");
+        const hDisplay = document.getElementById("h-display");
+        const status = document.getElementById("status");
 
-        pEl.innerText = pNum;
-        hEl.innerText = hNum;
+        let pNum, hNum;
+        
+        // SISTEM PROBABILITAS 40/60
+        const luck = Math.random(); // 0.0 - 1.0
+        
+        if (luck < 0.4) {
+            // PLAYER MENANG (40% Peluang)
+            pNum = Math.floor(Math.random() * 31);
+            if (pNum === 0) {
+                hNum = Math.floor(Math.random() * 30) + 1; // Host nggak boleh 0
+            } else {
+                hNum = Math.floor(Math.random() * pNum); // Host harus lebih kecil
+            }
+        } else {
+            // HOST MENANG (60% Peluang - Termasuk Seri)
+            hNum = Math.floor(Math.random() * 31);
+            if (hNum === 0) {
+                pNum = Math.floor(Math.random() * 31); // 0 vs 0 tetap Host Win
+            } else {
+                // Host punya angka 1-30, Player harus lebih kecil atau SAMA, dan bukan 0
+                pNum = Math.floor(Math.random() * hNum) + 1; 
+                // Jika ingin memaksa seri (biar host menang), sesekali buat pNum = hNum
+                if (Math.random() > 0.5) pNum = hNum;
+            }
+        }
 
-        // Visual check for King (0)
-        if (pNum === 0) pEl.classList.add("king");
-        if (hNum === 0) hEl.classList.add("king");
+        // Tampilkan Hasil
+        pDisplay.innerText = pNum;
+        hDisplay.innerText = hNum;
+
+        // Visual check for 0
+        pDisplay.classList.toggle("zero-king", pNum === 0);
+        hDisplay.classList.toggle("zero-king", hNum === 0);
 
         // LOGIKA PEMENANG
         if (pNum === hNum) {
-            // SERI
-            saldo += bet;
-            msg.innerHTML = '<span style="color:yellow">DRAW! Poin Kembali.</span>';
-        } 
-        else if (pNum === 0) {
-            // Player dapet 0 (KING) - Otomatis Win x3
-            const winAmt = bet * 3;
-            saldo += winAmt;
-            msg.innerHTML = `<span class="x3-notif">JACKPOT KING 0! +${winAmt}</span>`;
-        } 
-        else if (hNum === 0) {
-            // Host dapet 0 (KING) - Player Lose
-            msg.innerHTML = '<span style="color:red">LOSE! Host is THE KING.</span>';
-        } 
-        else if (pNum > hNum) {
-            // Menang Biasa (Angka lebih besar)
-            const winAmt = bet * 2;
-            saldo += winAmt;
-            msg.innerHTML = `<span style="color:#0f0">WIN! +${winAmt}</span>`;
-        } 
-        else {
-            // Kalah Biasa
-            msg.innerHTML = '<span style="color:red">LOSE! Angka Host lebih besar.</span>';
+            status.innerHTML = '<span style="color:red">DRAW! HOST WIN.</span>';
+        } else if (pNum === 0) {
+            const win = bet * 3;
+            points += win;
+            status.innerHTML = `<span class="win-x3">JACKPOT 0! +${win}</span>`;
+        } else if (hNum === 0) {
+            status.innerHTML = '<span style="color:red">LOSE! HOST IS KING 0.</span>';
+        } else if (pNum > hNum) {
+            const win = bet * 2;
+            points += win;
+            status.innerHTML = `<span style="color:#00ff00">WIN! +${win}</span>`;
+        } else {
+            status.innerHTML = '<span style="color:red">LOSE! HOST HIGHER.</span>';
         }
 
         updateUI();
     }
 
     function updateUI() {
-        document.getElementById("points").innerText = saldo;
-        localStorage.setItem("saldo_king", saldo);
+        document.getElementById("balance").innerText = points;
+        localStorage.setItem("points_hardcore", points);
     }
 </script>
 
